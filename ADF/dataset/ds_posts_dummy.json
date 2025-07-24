@@ -1,0 +1,27 @@
+{
+	"name": "ds_posts_dummy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_dummyjson",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"limit": {
+				"type": "string"
+			},
+			"skip": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "posts?limit=@{dataset().limit}&skip=@{dataset().skip}",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

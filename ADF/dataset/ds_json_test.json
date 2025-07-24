@@ -1,0 +1,19 @@
+{
+	"name": "ds_json_test",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_covidreportingdl",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "processed"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,24 @@
+{
+	"name": "tr_ingestion_population_data",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingest_population_data",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/population/blobs/population_by_age.tsv.gz",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/128cccf7-5db2-4132-b64d-2366f72af6cf/resourceGroups/ott_resourcegroup/providers/Microsoft.Storage/storageAccounts/sushimottadls011",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

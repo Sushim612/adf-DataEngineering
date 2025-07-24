@@ -1,0 +1,82 @@
+{
+	"name": "ds_orders_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_covidreportingdl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fullPath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "raw"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{split(dataset().fullPath, '/')[4]}",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@{split(dataset().fullPath, '/')[2]}/@{split(dataset().fullPath, '/')[3]}",
+					"type": "Expression"
+				},
+				"fileSystem": "raw"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"order_id": {
+					"type": "integer"
+				},
+				"customer": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"name": {
+							"type": "string"
+						},
+						"email": {
+							"type": "string"
+						}
+					}
+				},
+				"order_date": {
+					"type": "string"
+				},
+				"items": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"product_id": {
+								"type": "integer"
+							},
+							"name": {
+								"type": "string"
+							},
+							"price": {
+								"type": "number"
+							},
+							"quantity": {
+								"type": "integer"
+							}
+						}
+					}
+				},
+				"region": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

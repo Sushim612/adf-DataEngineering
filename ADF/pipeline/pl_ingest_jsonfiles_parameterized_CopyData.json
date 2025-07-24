@@ -1,0 +1,248 @@
+{
+	"name": "pl_ingest_jsonfiles_parameterized_CopyData",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachRegion",
+				"description": "Iterate over each region folders",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.regions",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Get Metadata Region",
+							"description": "Get Metadata of Region and its respective child items like files.",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_json_parameter",
+									"type": "DatasetReference",
+									"parameters": {
+										"sub_directory": {
+											"value": "@pipeline().parameters.sub_directory",
+											"type": "Expression"
+										},
+										"region": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"childItems"
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							}
+						},
+						{
+							"name": "FilterValidJSON",
+							"description": "Check for Valid JSON extension files only",
+							"type": "Filter",
+							"dependsOn": [
+								{
+									"activity": "Get Metadata Region",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('Get Metadata Region').output.childItems",
+									"type": "Expression"
+								},
+								"condition": {
+									"value": "@and(equals(item().type, 'File'), endswith(item().name, '.json'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "AppendPath",
+							"description": "Append Path of each files into an array",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable CurrenRegion",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "filteredFiles",
+								"value": {
+									"value": "@concat('/raw/orders/', variables('regionName'), '/', activity('FilterValidJSON').output.value[0].name)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable CurrenRegion",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "FilterValidJSON",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "regionName",
+								"value": {
+									"value": "@item()",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ForEachFilteredFiles",
+				"description": "Iterate over each valid Files Path",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ForEachRegion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('filteredFiles')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy dataToSink",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "JsonSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "JsonReadSettings"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_json_test_copy1",
+									"type": "DatasetReference",
+									"parameters": {
+										"fullPath": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_json_test_copy2",
+									"type": "DatasetReference",
+									"parameters": {
+										"fullPath": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"sub_directory": {
+				"type": "string",
+				"defaultValue": "orders"
+			},
+			"regions": {
+				"type": "array",
+				"defaultValue": [
+					"US",
+					"EU",
+					"APAC"
+				]
+			},
+			"yearMonth": {
+				"type": "string",
+				"defaultValue": "202507"
+			}
+		},
+		"variables": {
+			"regionName": {
+				"type": "String"
+			},
+			"filteredFiles": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "ingest"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-21T09:41:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

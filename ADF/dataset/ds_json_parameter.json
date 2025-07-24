@@ -1,0 +1,30 @@
+{
+	"name": "ds_json_parameter",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_covidreportingdl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sub_directory": {
+				"type": "string"
+			},
+			"region": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@concat('raw/', dataset().sub_directory, '/', dataset().region)",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

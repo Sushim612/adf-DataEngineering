@@ -1,0 +1,185 @@
+{
+	"name": "pl_ReqRes_Pagination",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('hasData'), false)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "GetPage",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"url": {
+									"value": "https://reqres.in/api/users?page=@{variables('pageNumber')}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "CheckHasData",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetPage",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "hasData",
+								"value": {
+									"value": "@greater(length(activity('GetPage').output.data),0)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "CheckHasData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@greater(length(activity('GetPage').output.data),0)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Copy WebsiteData",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "RestSource",
+												"httpRequestTimeout": "00:01:40",
+												"requestInterval": "00.00:00:00.010",
+												"requestMethod": "GET",
+												"paginationRules": {
+													"supportRFC5988": "true"
+												}
+											},
+											"sink": {
+												"type": "JsonSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings"
+												},
+												"formatSettings": {
+													"type": "JsonWriteSettings"
+												}
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_ReqRes_PagedData",
+												"type": "DatasetReference",
+												"parameters": {
+													"pageNumber": {
+														"value": "@string(variables('pageNumber'))",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_JSON_ResReq_dl",
+												"type": "DatasetReference",
+												"parameters": {
+													"fileName": {
+														"value": "@variables('pageNumber')",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "IncrementPage",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "If Condition1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "NextPage",
+								"value": {
+									"value": "@add(variables('pageNumber'),1)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"pageNumber": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"hasData": {
+				"type": "Boolean",
+				"defaultValue": true
+			},
+			"NextPage": {
+				"type": "Integer"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-24T14:20:38Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

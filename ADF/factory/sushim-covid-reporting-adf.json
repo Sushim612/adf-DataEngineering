@@ -1,0 +1,9 @@
+{
+	"name": "sushim-covid-reporting-adf",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "e731c158-918b-475d-9ce5-f399d4b52c9e",
+		"tenantId": "038d76ac-96c9-48c7-b243-c02f2d7a7b61"
+	}
+}

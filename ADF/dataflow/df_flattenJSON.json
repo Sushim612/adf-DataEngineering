@@ -1,0 +1,116 @@
+{
+	"name": "df_flattenJSON",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_orders_json",
+						"type": "DatasetReference"
+					},
+					"name": "sourceJsonOrderUS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_flattenedorders",
+						"type": "DatasetReference"
+					},
+					"name": "sinkFlattenedTable"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenJSON"
+				},
+				{
+					"name": "selectCustomerFields"
+				},
+				{
+					"name": "derivedCalculateTotalPrice"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as integer,",
+				"          customer as (id as integer, name as string, email as string),",
+				"          order_date as string,",
+				"          items as (product_id as integer, name as string, price as double, quantity as integer)[],",
+				"          region as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: true,",
+				"     limit: 100,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'singleDocument',",
+				"     partitionBy('hash', 1)) ~> sourceJsonOrderUS",
+				"selectCustomerFields foldDown(unroll(items),",
+				"     mapColumn(",
+				"          order_id,",
+				"          customer,",
+				"          order_date,",
+				"          items,",
+				"          region",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenJSON",
+				"sourceJsonOrderUS select(mapColumn(",
+				"          order_id,",
+				"          customer,",
+				"          customer_id = customer.id,",
+				"          customer_name = customer.name,",
+				"          customer_email = customer.email,",
+				"          order_date,",
+				"          items,",
+				"          region",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectCustomerFields",
+				"flattenJSON derive(total_price = items.price*items.quantity,",
+				"          order_month = toString(toTimestamp(order_date, 'yyyy-MM-dd'), 'yyyy-MM')) ~> derivedCalculateTotalPrice",
+				"derivedCalculateTotalPrice sink(allowSchemaDrift: false,",
+				"     validateSchema: true,",
+				"     input(",
+				"          row_id as integer,",
+				"          order_id as integer,",
+				"          customer_id as integer,",
+				"          customer_name as string,",
+				"          customer_email as string,",
+				"          order_date as date,",
+				"          order_month as string,",
+				"          product_id as integer,",
+				"          product_name as string,",
+				"          price as decimal(10,2),",
+				"          quantity as integer,",
+				"          total_price as decimal(12,2),",
+				"          region as string,",
+				"          ingestion_time as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          order_id,",
+				"          customer_id = customer.id,",
+				"          customer_name = customer.name,",
+				"          customer_email = customer.email,",
+				"          order_date,",
+				"          order_month,",
+				"          product_id = items.product_id,",
+				"          product_name = items.name,",
+				"          price = items.price,",
+				"          quantity = items.quantity,",
+				"          total_price,",
+				"          region",
+				"     )) ~> sinkFlattenedTable"
+			]
+		}
+	}
+}

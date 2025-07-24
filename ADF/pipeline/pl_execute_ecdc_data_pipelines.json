@@ -1,0 +1,75 @@
+{
+	"name": "pl_execute_ecdc_data_pipelines",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute ECDC Data Ingestion Pipelines",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_ingest_ecdc_data",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute ECDC Processed cases and deaths pipelines",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute ECDC Data Ingestion Pipelines",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_processed_cases_and_deaths_data",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Processed Hospital Admissions pipelines",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute ECDC Data Ingestion Pipelines",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_processed_hospital_admissions",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "Execute"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-20T07:48:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

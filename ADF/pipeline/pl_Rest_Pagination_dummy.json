@@ -1,0 +1,221 @@
+{
+	"name": "pl_Rest_Pagination_dummy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Until",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('hasMore'), false)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "GetPage",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"url": {
+									"value": "@concat('https://dummyjson.com/posts?limit=', string(variables('limit')), '&skip=', string(variables('skip')))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "HasMore",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "GetPage",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "hasMore",
+								"value": {
+									"value": "@less(add(variables('skip'), variables('limit')), activity('GetPage').output.total)\n",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "CheckIfSkipisinLimit",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "HasMore",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@equals(variables('hasMore'), true)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Copy data_ToDatalake",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "RestSource",
+												"httpRequestTimeout": "00:01:40",
+												"requestInterval": "00.00:00:00.010",
+												"requestMethod": "GET",
+												"paginationRules": {
+													"supportRFC5988": "true"
+												}
+											},
+											"sink": {
+												"type": "JsonSink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings",
+													"copyBehavior": "PreserveHierarchy"
+												},
+												"formatSettings": {
+													"type": "JsonWriteSettings"
+												}
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_posts_dummy",
+												"type": "DatasetReference",
+												"parameters": {
+													"limit": {
+														"value": "@string(variables('limit'))",
+														"type": "Expression"
+													},
+													"skip": {
+														"value": "@string(variables('skip'))",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_JSON_ResReq_dl",
+												"type": "DatasetReference",
+												"parameters": {
+													"fileName": "@concat('posts_', string(variables('skip')), '.json')"
+												}
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "IncrementSkip_TempVariable",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "CheckIfSkipisinLimit",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "IncrementSkip",
+								"value": {
+									"value": "@add(variables('skip'), variables('limit'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "IncrementSkipPipelineparameter",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "IncrementSkip_TempVariable",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "skip",
+								"value": {
+									"value": "@variables('IncrementSkip')",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"limit": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			"skip": {
+				"type": "Integer",
+				"defaultValue": 0
+			},
+			"hasMore": {
+				"type": "Boolean",
+				"defaultValue": true
+			},
+			"incremenskip": {
+				"type": "Integer"
+			},
+			"IncrementSkip": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "ingest"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-07-24T14:27:12Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

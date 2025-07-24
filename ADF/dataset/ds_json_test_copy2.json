@@ -1,0 +1,32 @@
+{
+	"name": "ds_json_test_copy2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_covidreportingdl",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fullPath": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{split(dataset().fullPath, '/')[4]}",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@{split(dataset().fullPath, '/')[2]}/@{split(dataset().fullPath, '/')[3]}",
+					"type": "Expression"
+				},
+				"fileSystem": "processed"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
