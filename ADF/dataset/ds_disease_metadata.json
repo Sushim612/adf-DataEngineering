@@ -1,0 +1,46 @@
+{
+	"name": "ds_disease_metadata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_covid_db",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "country_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "api_url",
+				"type": "nvarchar"
+			},
+			{
+				"name": "target_schema",
+				"type": "nvarchar"
+			},
+			{
+				"name": "target_table",
+				"type": "nvarchar"
+			},
+			{
+				"name": "load_type",
+				"type": "nvarchar"
+			},
+			{
+				"name": "is_active",
+				"type": "bit"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "covid_api_metadata"
+		}
+	}
+}

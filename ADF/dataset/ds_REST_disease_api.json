@@ -1,0 +1,12 @@
+{
+	"name": "ds_REST_disease_api",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_disease_api",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "ds_sql_disease_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_covid_db",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "updated",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "country",
+				"type": "nvarchar"
+			},
+			{
+				"name": "cases",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "todayCases",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "deaths",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "todayDeaths",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "recovered",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "active",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "critical",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "stage",
+			"table": "covid_cases_india"
+		}
+	}
+}
