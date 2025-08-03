@@ -5,8 +5,19 @@
 			"referenceName": "ls_disease_api",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"relativeUrl": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().relativeUrl",
+				"type": "Expression"
+			}
+		},
 		"schema": []
 	}
 }

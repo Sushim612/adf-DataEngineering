@@ -156,7 +156,13 @@
 							"inputs": [
 								{
 									"referenceName": "ds_REST_disease_api",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"relativeUrl": {
+											"value": "@concat('v3/covid-19/countries/',item().country_name)",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
