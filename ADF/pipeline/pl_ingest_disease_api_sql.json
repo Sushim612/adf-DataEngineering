@@ -75,7 +75,7 @@
 											"storedProcedureParameters": {
 												"table_name": {
 													"value": {
-														"value": "@activity('Lookup_MetadataApiTable').output.target_table",
+														"value": "@activity('Lookup_MetadataApiTable').output.value[0].target_table",
 														"type": "Expression"
 													},
 													"type": "String"
