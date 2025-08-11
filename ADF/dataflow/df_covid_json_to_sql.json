@@ -1,0 +1,69 @@
+{
+	"name": "df_covid_json_to_sql",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_REST_disease_api",
+						"type": "DatasetReference"
+					},
+					"name": "RESTdataset"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_disease_table",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     limit: 10,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> RESTdataset",
+				"RESTdataset foldDown(unroll((countryInfo)),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten",
+				"flatten select(skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          updated as long,",
+				"          country as string,",
+				"          cases as integer,",
+				"          todayCases as integer,",
+				"          deaths as integer,",
+				"          todayDeaths as integer,",
+				"          recovered as integer,",
+				"          active as integer,",
+				"          critical as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
