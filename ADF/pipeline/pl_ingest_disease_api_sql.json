@@ -146,6 +146,30 @@
 												"value": "@concat('v3/covid-19/countries/',item().country_name)",
 												"type": "Expression"
 											}
+										},
+										"sink1": {
+											"tableName": {
+												"value": "@item().target_table",
+												"type": "Expression"
+											},
+											"schemaName": {
+												"value": "@item().target_schema",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceParameters": {
+										"sink1": {
+											"schemaLinkedService": {
+												"tableName": {
+													"value": "@item().target_table",
+													"type": "Expression"
+												},
+												"schemaName": {
+													"value": "@item().target_schema",
+													"type": "Expression"
+												}
+											}
 										}
 									}
 								},
