@@ -42,7 +42,6 @@
 				"     ),",
 				"     allowSchemaDrift: false,",
 				"     validateSchema: true,",
-				"     limit: 100,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'singleDocument',",
 				"     partitionBy('hash', 1)) ~> sourceJsonOrderUS",
