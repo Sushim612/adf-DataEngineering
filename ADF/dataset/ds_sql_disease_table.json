@@ -5,6 +5,14 @@
 			"referenceName": "ls_sql_covid_db",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"tableName": {
+				"type": "string"
+			},
+			"schemaName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -54,8 +62,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "stage",
-			"table": "covid_cases_india"
+			"schema": {
+				"value": "@dataset().schemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
