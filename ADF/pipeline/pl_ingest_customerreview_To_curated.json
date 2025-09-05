@@ -1,0 +1,126 @@
+{
+	"name": "pl_ingest_customerreview_To_curated",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetReview_lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_RawReviews",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "EachReview",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetReview_lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetReview_lookup').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 5,
+					"activities": [
+						{
+							"name": "ScoreOneReview",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "POST",
+									"requestBody": {
+										"value": "@concat(\n  '{',\n    '\"kind\":\"SentimentAnalysis\",',\n    '\"analysisInput\":{\"documents\":[{',\n      '\"id\":\"', string(item().review_id), '\",',\n      '\"language\":\"en\",',\n      '\"text\":\"', replace(string(item().review_text), '\"', '\\\\\"'), '\"',\n    '}]},',\n    '\"parameters\":{\"opinionMining\":false}',\n  '}'\n)",
+										"type": "Expression"
+									},
+									"additionalHeaders": {
+										"Ocp-Apim-Subscription-Key": "@Microsoft.KeyVault(SecretName=LangAPIKey)",
+										"Content-Type": "application/json"
+									},
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_Language_api",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_SentimentRaw",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": {
+											"value": "@concat('review_', string(item().review_id), '.json')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"Reviews": {
+				"type": "Array"
+			}
+		},
+		"annotations": []
+	}
+}
