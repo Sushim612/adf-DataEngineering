@@ -5,6 +5,9 @@
 			"referenceName": "ls_sentimentBlob",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "AI_Practice"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
