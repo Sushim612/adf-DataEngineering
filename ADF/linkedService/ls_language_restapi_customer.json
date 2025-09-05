@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://sushimsentimentlanguage.cognitiveservices.azure.com/language/:analyze-text?api-version=2024-11-01)",
+			"url": "https://sushimsentimentlanguage.cognitiveservices.azure.com",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		}
