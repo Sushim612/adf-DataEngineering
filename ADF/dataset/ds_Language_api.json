@@ -1,5 +1,5 @@
 {
-	"name": "ds_sentiment_raw_restapi",
+	"name": "ds_Language_api",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_language_restapi_customer",
