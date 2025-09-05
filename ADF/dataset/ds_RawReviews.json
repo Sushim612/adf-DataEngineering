@@ -1,14 +1,9 @@
 {
-	"name": "ds_sentiment_curated",
+	"name": "ds_RawReviews",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sentimentBlob",
 			"type": "LinkedServiceReference"
-		},
-		"parameters": {
-			"fileName": {
-				"type": "string"
-			}
 		},
 		"folder": {
 			"name": "AI_Practice"
@@ -18,12 +13,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "@dataset().fileName",
-					"type": "Expression"
-				},
-				"folderPath": "sentiment_raw",
-				"container": "curated"
+				"fileName": "customer_reviews_sample.csv",
+				"container": "raw"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
