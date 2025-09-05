@@ -1,0 +1,31 @@
+{
+	"name": "ds_SentimentRaw",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sentimentBlob",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "AI_Practice"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"folderPath": "sentiment_raw",
+				"container": "curated"
+			}
+		},
+		"schema": {}
+	}
+}
