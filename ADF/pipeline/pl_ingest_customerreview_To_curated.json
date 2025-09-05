@@ -71,11 +71,14 @@
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "POST",
 									"requestBody": {
-										"value": "@concat(\n  '{',\n    '\"kind\":\"SentimentAnalysis\",',\n    '\"analysisInput\":{\"documents\":[{',\n      '\"id\":\"', string(item().review_id), '\",',\n      '\"language\":\"en\",',\n      '\"text\":\"', replace(string(item().review_text), '\"', '\\\\\"'), '\"',\n    '}]},',\n    '\"parameters\":{\"opinionMining\":false}',\n  '}'\n)",
+										"value": "@concat(\n  '{',\n    '\"kind\":\"SentimentAnalysis\",',\n    '\"analysisInput\":{\"documents\":[{',\n      '\"id\":\"', string(item().review_id), '\",',\n      '\"language\":\"en\",',\n      '\"text\":\"',\n        replace(\n          replace(\n            replace(string(item().review_text), '\\\\', '\\\\\\\\'),\n          '\"','\\\\\"'),\n        '\\n',' '),\n      '\"',\n    '}]},\"parameters\":{\"opinionMining\":false}',\n  '}'\n)\n",
 										"type": "Expression"
 									},
 									"additionalHeaders": {
-										"Ocp-Apim-Subscription-Key": "@Microsoft.KeyVault(SecretName=LangAPIKey)",
+										"Ocp-Apim-Subscription-Key": {
+											"value": "@Microsoft.KeyVault(SecretName=LangAPIKey)",
+											"type": "Expression"
+										},
 										"Content-Type": "application/json"
 									},
 									"paginationRules": {
