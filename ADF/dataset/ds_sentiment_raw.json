@@ -1,0 +1,12 @@
+{
+	"name": "ds_sentiment_raw",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_language_restapi_customer",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
