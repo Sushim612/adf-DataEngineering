@@ -10,6 +10,9 @@
 		},
 		"annotations": [],
 		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "/language/:analyze-text?api-version=2024-11-01"
+		},
 		"schema": []
 	}
 }
