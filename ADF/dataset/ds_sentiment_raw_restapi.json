@@ -5,6 +5,9 @@
 			"referenceName": "ls_language_restapi_customer",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "AI_Practice"
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"schema": []
