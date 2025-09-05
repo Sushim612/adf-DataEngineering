@@ -1,5 +1,5 @@
 {
-	"name": "ds_sentiment_raw",
+	"name": "ds_sentiment_raw_restapi",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_language_restapi_customer",
